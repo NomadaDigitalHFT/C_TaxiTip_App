@@ -3,7 +3,7 @@ import { View, FlatList, Text, ActivityIndicator, Alert } from "react-native";
 import styled from "styled-components/native";
 import DriverCard from "./../../components/driver/DriverCard";
 import { db } from "./../../firebase/firebaseConfig";
-import { collection, onSnapshot, doc, updateDoc } from "firebase/firestore";
+import { collection, onSnapshot, doc, updateDoc, query, orderBy } from "firebase/firestore";
 
 const ListContainer = styled.View`
   flex: 1;
@@ -17,8 +17,11 @@ const GalleryCards = ({ navigation }) => {
   useEffect(() => {
     const userCardsCollection = collection(db, "userCards");
 
+    // 🔹 Consulta ordenada en Firestore (directamente desde la BD, más antiguas primero)
+    const q = query(userCardsCollection, orderBy("createdAt", "asc")); 
+
     const unsubscribe = onSnapshot(
-      userCardsCollection,
+      q,
       (snapshot) => {
         if (snapshot.empty) {
           setRequests([]);
@@ -32,12 +35,7 @@ const GalleryCards = ({ navigation }) => {
             ...doc.data(),
           }));
 
-          // 🔹 Ordenar correctamente de la más antigua a la más reciente
-          const sortedRequests = newRequests
-            .filter(req => req.createdAt) // Asegurar que tienen fecha
-            .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt)); 
-
-          setRequests(sortedRequests);
+          setRequests(newRequests); // 🔥 Ya están ordenados desde Firestore
           setLoading(false);
         } catch (error) {
           console.error("Error procesando solicitudes:", error);

@@ -35,11 +35,17 @@ const ButtonText = styled.Text`
   text-align: center;
 `;
 
+const formatTime = (timestamp) => {
+  if (!timestamp) return "N/A";
+  const date = new Date(timestamp);
+  return date.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+};
+
 const DriverCard = ({ data, onAccept }) => {
   return (
     <CardContainer>
+      <InfoText>🕒 Hora: {formatTime(data.createdAt)}</InfoText>
       <InfoText>📍 Dirección: {data.lastLocation?.address || "N/A"}</InfoText>
-      <InfoText>🕒 Hora: {data.createdAt ? new Date(data.createdAt).toLocaleTimeString() : "N/A"}</InfoText>
       <InfoText>📏 Distancia: {data.lastLocation?.distance ? `${data.lastLocation.distance} km` : "N/A"}</InfoText>
       <InfoText>💰 Propina: {data.tip ? `${data.tip}€` : "No especificada"}</InfoText>
       <ButtonContainer>

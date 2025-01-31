@@ -20,8 +20,8 @@ function RootStack() {
         initialParams={{ role: "usuario" }} // Parámetro predeterminado
       />
 
-      {/* Flujo del usuario */}
-      <Stack.Screen name="UserNavigator" component={UserNavigator} />
+      {/* Flujo del usuario
+      <Stack.Screen name="UserNavigator" component={UserNavigator} /> */}
 
       {/* Flujo del conductor */}
       <Stack.Screen name="DriverNavigator" component={DriverNavigator} />
