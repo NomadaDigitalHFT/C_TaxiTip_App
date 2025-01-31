@@ -1,6 +1,6 @@
 import React from "react";
 import { Alert, Button } from "react-native";
-import { getFirestore, doc, updateDoc } from "firebase/firestore";
+import { getFirestore, doc, getDoc, updateDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 
 const ButtonConfirmationTrip = ({ requestId, onRemoveCard }) => {
@@ -16,8 +16,23 @@ const ButtonConfirmationTrip = ({ requestId, onRemoveCard }) => {
     }
 
     try {
+      const requestRef = doc(db, "requests", requestId);
+      const requestSnap = await getDoc(requestRef);
+
+      if (!requestSnap.exists()) {
+        Alert.alert("Error", "La solicitud ya no está disponible.");
+        return;
+      }
+
+      const requestData = requestSnap.data();
+
+      if (requestData.assignedDriver) {
+        Alert.alert("Error", "Otro conductor ya aceptó esta solicitud.");
+        return;
+      }
+
       // Actualizar el estado del viaje en Firestore
-      await updateDoc(doc(db, "requests", requestId), {
+      await updateDoc(requestRef, {
         status: "pending",
         assignedDriver: driver.uid,
       });
@@ -26,9 +41,10 @@ const ButtonConfirmationTrip = ({ requestId, onRemoveCard }) => {
       onRemoveCard(requestId);
 
       Alert.alert("Esperando confirmación del usuario.");
+
     } catch (error) {
       console.error("Error al aceptar viaje:", error);
-      Alert.alert("Error", "No se pudo aceptar la solicitud.");
+      Alert.alert("Error", "No se pudo aceptar la solicitud. Verifica permisos en Firestore.");
     }
   };
 
@@ -36,6 +52,7 @@ const ButtonConfirmationTrip = ({ requestId, onRemoveCard }) => {
 };
 
 export default ButtonConfirmationTrip;
+
 
 
 
