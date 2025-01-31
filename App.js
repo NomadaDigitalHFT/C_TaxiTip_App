@@ -1,24 +1,21 @@
 import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
-import { UserProvider } from "./src/contexts/UserContext"; // Contexto del usuario
-import { DriverProvider } from "./src/contexts/DriverContext"; // Contexto del conductor
-import RootStack from "./src/navigation/RootStack"; // Importa el navegador raíz
-// import { auth, db } from "./../TaxiTip_App/src/firebase/firebaseConfig";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { ThemeProvider } from "styled-components/native";
+import { DriverProvider } from "./src/contexts/DriverContext";
+import RootStack from "./src/navigation/RootStack";
+import theme from "./src/styles/theme";
 
-// console.log("📡 Firebase Auth:", auth);
-// console.log("📡 Firestore:", db);
+const Stack = createNativeStackNavigator();
 
-
-const App = () => {
+export default function App() {
   return (
-    <UserProvider>
-      <DriverProvider>
+    <DriverProvider>
+      <ThemeProvider theme={theme}>
         <NavigationContainer>
           <RootStack />
         </NavigationContainer>
-      </DriverProvider>
-    </UserProvider>
+      </ThemeProvider>
+    </DriverProvider>
   );
-};
-
-export default App;
+}

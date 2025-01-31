@@ -1,5 +1,4 @@
 import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
 import styled from 'styled-components/native';
 
 const CardContainer = styled.View`
@@ -36,13 +35,13 @@ const ButtonText = styled.Text`
   text-align: center;
 `;
 
-const DriverCard = ({ time, location, tip, distance, onAccept }) => {
+const DriverCard = ({ data, onAccept }) => {
   return (
     <CardContainer>
-      <InfoText>Hora: {time}</InfoText>
-      <InfoText>Ubicación: {location}</InfoText>
-      <InfoText>Propina: {tip}</InfoText>
-      <InfoText>Distancia: {distance}</InfoText>
+      <InfoText>📍 Dirección: {data.lastLocation?.address || "N/A"}</InfoText>
+      <InfoText>🕒 Hora: {data.createdAt ? new Date(data.createdAt).toLocaleTimeString() : "N/A"}</InfoText>
+      <InfoText>📏 Distancia: {data.lastLocation?.distance ? `${data.lastLocation.distance} km` : "N/A"}</InfoText>
+      <InfoText>💰 Propina: {data.tip ? `${data.tip}€` : "No especificada"}</InfoText>
       <ButtonContainer>
         <ActionButton onPress={onAccept}>
           <ButtonText>Aceptar</ButtonText>

@@ -11,9 +11,9 @@ const WelcomeScreen = ({ navigation }) => {
       <Image source={require("../../assets/icons/Moneda_taxitip.png")} style={styles.profileImage} />
       <Text style={styles.title}>¡Bienvenido a TaxiTip!</Text>
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={() => handleNavigation("usuario")}>
+        {/* <TouchableOpacity style={styles.button} onPress={() => handleNavigation("usuario")}>
           <Text style={styles.buttonText}>Usuario</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <TouchableOpacity style={styles.button} onPress={() => handleNavigation("conductor")}>
           <Text style={styles.buttonText}>Conductor</Text>
         </TouchableOpacity>

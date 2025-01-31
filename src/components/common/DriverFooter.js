@@ -27,7 +27,7 @@ const FooterText = styled.Text`
   color: #333;
 `;
 
-const DriverFooter = () => {
+const Footer = () => {
   const navigation = useNavigation();
 
   return (
@@ -52,8 +52,8 @@ const DriverFooter = () => {
   );
 };
 
-export default DriverFooter;
+export default Footer;
 
 // Usage in DriverHomeScreen.js
 // Place the following line at the bottom of the return in DriverHomeScreen component
-// <DriverFooter />
+// <Footer />

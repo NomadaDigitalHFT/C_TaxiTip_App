@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { View, Text } from 'react-native';
-import styled from 'styled-components/native';
-import GalleryCards from './../../components/screens/GalleryCards';
-import DriverFooter from './../../components/common/DriverFooter';
+import React, { useState } from "react";
+import { View, Text } from "react-native";
+import styled from "styled-components/native";
+import GalleryCards from "./GalleryCards";
+import DriverFooter from "./../../components/common/DriverFooter";
 
 const Container = styled.View`
   flex: 1;
@@ -26,7 +26,7 @@ const HeaderText = styled.Text`
 const ToggleButton = styled.TouchableOpacity`
   padding: 10px 20px;
   border-radius: 5px;
-  background-color: ${(props) => (props.available ? '#28a745' : '#dc3545')};
+  background-color: ${props => (props.available ? "#28a745" : "#dc3545")};
 `;
 
 const ToggleButtonText = styled.Text`
@@ -45,16 +45,20 @@ const DriverHomeScreen = ({ navigation }) => {
   return (
     <Container>
       <Header>
-        <HeaderText>Modo: {isAvailable ? 'Disponible' : 'No Disponible'}</HeaderText>
+        <HeaderText>
+          Modo: {isAvailable ? "Disponible" : "No Disponible"}
+        </HeaderText>
         <ToggleButton available={isAvailable} onPress={toggleAvailability}>
           <ToggleButtonText>
-            {isAvailable ? 'No Disponible' : 'Disponible'}
+            {isAvailable ? "No Disponible" : "Disponible"}
           </ToggleButtonText>
         </ToggleButton>
       </Header>
 
-      {isAvailable ? <GalleryCards navigation={navigation} /> : (
-        <Text style={{ textAlign: 'center', marginTop: 20 }}>
+      {isAvailable ? (
+        <GalleryCards navigation={navigation} />
+      ) : (
+        <Text style={{ textAlign: "center", marginTop: 20 }}>
           Activa el modo disponible para ver las solicitudes.
         </Text>
       )}
@@ -65,4 +69,3 @@ const DriverHomeScreen = ({ navigation }) => {
 };
 
 export default DriverHomeScreen;
-

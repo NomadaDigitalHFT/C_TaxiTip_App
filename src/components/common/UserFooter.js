@@ -27,13 +27,13 @@ const FooterText = styled.Text`
   color: #333;
 `;
 
-const UserFooter = () => {
+const Footer = () => {
   const navigation = useNavigation();
 
   return (
     <FooterContainer>
       {/* Home Button */}
-      <FooterButton onPress={() => navigation.navigate('UserHomeScreen')}>
+      <FooterButton onPress={() => navigation.navigate('UserHome')}>
         <Ionicons name="home" size={24} color="#007BFF" />
         <FooterText>Home</FooterText>
       </FooterButton>
@@ -52,4 +52,4 @@ const UserFooter = () => {
   );
 };
 
-export default UserFooter;
+export default Footer;

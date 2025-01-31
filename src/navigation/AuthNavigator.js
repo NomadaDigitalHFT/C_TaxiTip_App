@@ -21,3 +21,6 @@ const AuthNavigator = ({ route }) => {
 export default AuthNavigator;
 
 
+
+
+
