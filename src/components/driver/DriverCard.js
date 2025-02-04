@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components/native';
+import ButtonConfirmationTrip from './../../elements/Buttons/ButtonConfirmationTrip';
 
 const CardContainer = styled.View`
   background-color: #fff;
@@ -22,26 +23,18 @@ const ButtonContainer = styled.View`
   margin-top: 10px;
 `;
 
-const ActionButton = styled.TouchableOpacity`
-  padding: 10px 15px;
-  border-radius: 5px;
-  background-color: #28a745;
-`;
-
-const ButtonText = styled.Text`
-  color: #fff;
-  font-size: 14px;
-  font-weight: bold;
-  text-align: center;
-`;
-
 const formatTime = (timestamp) => {
   if (!timestamp) return "N/A";
   const date = new Date(timestamp);
   return date.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
 };
 
-const DriverCard = ({ data, onAccept }) => {
+const DriverCard = ({ data, onRemove }) => {
+  if (!data?.id) {
+    console.error("❌ Error: El ID de la solicitud es undefined en DriverCard.");
+    return null;
+  }
+
   return (
     <CardContainer>
       <InfoText>🕒 Hora: {formatTime(data.createdAt)}</InfoText>
@@ -49,12 +42,11 @@ const DriverCard = ({ data, onAccept }) => {
       <InfoText>📏 Distancia: {data.lastLocation?.distance ? `${data.lastLocation.distance} km` : "N/A"}</InfoText>
       <InfoText>💰 Propina: {data.tip ? `${data.tip}€` : "No especificada"}</InfoText>
       <ButtonContainer>
-        <ActionButton onPress={onAccept}>
-          <ButtonText>Aceptar</ButtonText>
-        </ActionButton>
+        <ButtonConfirmationTrip userCardsId={data.id} onRemoveCard={onRemove} />
       </ButtonContainer>
     </CardContainer>
   );
 };
 
 export default DriverCard;
+

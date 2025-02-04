@@ -1,0 +1,37 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // 🔹 Permitir a los usuarios autenticados leer TODAS las "userCards" pero escribir solo en las suyas
+    match /userCards/{documentId} {
+      allow read: if request.auth != null;
+             // 🔹 Permitir que el usuario dueño pueda modificar su propia tarjeta (incluyendo dirección y geolocalización)
+      allow write: if request.auth != null && request.auth.uid == documentId;
+    }
+
+    // 🔹 Permitir a los usuarios autenticados leer su propio perfil y a los conductores leer los perfiles de los usuarios
+    match /usuarios/{userId} {
+      allow read: if request.auth != null;  // Todos los autenticados pueden leer (usuarios y conductores)
+      allow write: if request.auth != null && request.auth.uid == userId; // Solo el usuario dueño puede editar
+    }
+
+    // 🔹 Permitir a los conductores autenticados leer su perfil y a los usuarios ver la info de los conductores
+    match /conductores/{driverId} {
+      allow read: if request.auth != null; // Todos los autenticados pueden leer (usuarios y conductores)
+      allow write: if request.auth != null && request.auth.uid == driverId; // Solo el conductor dueño puede editar
+    }
+
+    // 🔹 Modificación en requests para permitir que los conductores asignen una solicitud a sí mismos
+    match /requests/{requestId} {
+      allow read: if request.auth != null; 
+      
+      allow write: if request.auth != null && (
+        request.auth.uid == request.resource.data.userId || 
+        request.auth.uid == request.resource.data.assignedDriver ||
+        
+        // 🔹 Permitir que un conductor asigne la solicitud si aún no hay conductor asignado
+        (!exists(request.resource.data.assignedDriver) || request.resource.data.assignedDriver == null)
+      );
+    }
+  }
+}

@@ -1,0 +1,39 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // 🔹 Permitir lectura de userCards
+    match /userCards/{documentId} {
+      allow read: if request.auth != null;
+
+    
+      // 🔹 Permitir que un conductor se asigne a sí mismo si aún no hay assignedDriver
+      allow update: if request.auth != null && (
+        (!exists(resource.data.assignedDriver) || resource.data.assignedDriver == null) ||
+        request.auth.uid == resource.data.assignedDriver
+      );
+    }
+
+    // 🔹 Permitir a los conductores autenticados leer su perfil y permitir a los usuarios ver la info de los conductores
+    match /conductores/{driverId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.uid == driverId;
+    }
+
+    // 🔹 Permitir que los conductores asignen una solicitud a sí mismos y luego modificarla
+    match /requests/{requestId} {
+      allow read: if request.auth != null;
+      
+      allow write: if request.auth != null && (
+        request.auth.uid == resource.data.userId || 
+        request.auth.uid == resource.data.assignedDriver ||
+
+        // 🔹 Permitir que un conductor asigne la solicitud si aún no hay conductor asignado
+        (!exists(resource.data.assignedDriver) || resource.data.assignedDriver == null)
+      );
+
+      // 🔹 Permitir a los conductores modificar la solicitud si están asignados
+      allow update: if request.auth != null && request.auth.uid == resource.data.assignedDriver;
+    }
+  }
+}
