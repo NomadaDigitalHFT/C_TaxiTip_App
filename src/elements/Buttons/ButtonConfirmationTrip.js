@@ -53,14 +53,14 @@ const ButtonConfirmationTrip = ({ userCardsId, onRemoveCard }) => {
       await updateDoc(requestRef, {
         assignedDriver: driver.uid,
         driverLocation: driverLocation,
-        status: "waiting_user_confirmation",
+        status: "fare_confirmed", // Cambio de estado para avanzar
       });
 
       console.log("Solicitud aceptada y Firestore actualizado.");
 
       onRemoveCard(userCardsId);
       setIsWaiting(true);
-      Alert.alert("Esperando confirmación del usuario.");
+      Alert.alert("🚖 Has aceptado el viaje. Esperando confirmación del usuario.");
 
       navigation.navigate("DriverTripDescriptionScreen", { userCardsId });
     } catch (error) {
@@ -72,7 +72,7 @@ const ButtonConfirmationTrip = ({ userCardsId, onRemoveCard }) => {
   return (
     <View style={styles.container}>
       <Button
-        title={isWaiting ? "A la espera de Confirmación" : "Aceptar"}
+        title={isWaiting ? "A la espera de Confirmación" : "Aceptar Viaje"}
         onPress={handleAcceptTrip}
         color={isWaiting ? "#FFA500" : "#008000"}
         disabled={isWaiting}

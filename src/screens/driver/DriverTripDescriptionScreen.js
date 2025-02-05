@@ -1,53 +1,64 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, ActivityIndicator, StyleSheet, Alert } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { getFirestore, doc, onSnapshot } from "firebase/firestore";
+import { useRoute } from "@react-navigation/native";
+import DriverFooter from "./../../components/common/DriverFooter";
 
-const DriverTripDescriptionScreen = ({ route, navigation }) => {
-  const { userCardsId } = route.params || {};
+const DriverTripDescriptionScreen = () => {
+  const route = useRoute();
+  const { requestId } = route.params;
   const db = getFirestore();
   const [tripData, setTripData] = useState(null);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!userCardsId) {
-      console.error("❌ Error: userCardsId es undefined. No se puede continuar.");
-      Alert.alert("Error", "No se encontró la solicitud. Regresando...");
-      navigation.goBack();
-      return;
-    }
+    if (!requestId) return;
 
-    const requestRef = doc(db, "userCards", userCardsId);
-    const unsubscribe = onSnapshot(requestRef, (docSnapshot) => {
-      if (docSnapshot.exists()) {
-        setTripData(docSnapshot.data());
+    console.log("📡 Escuchando datos de Firestore para requestId:", requestId);
+
+    const requestRef = doc(db, "userCards", requestId);
+    const unsubscribe = onSnapshot(requestRef, (docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        setTripData(data);
       } else {
-        Alert.alert("Error", "La solicitud ya no existe.");
-        navigation.goBack();
+        console.error("❌ Error: No se encontró la solicitud.");
       }
-      setLoading(false);
     });
 
     return () => unsubscribe();
-  }, [userCardsId]);
+  }, [requestId]);
 
-  if (loading) {
-    return <ActivityIndicator size="large" color="#007bff" />;
-  }
+  // Función para calcular la tarifa Tip (km * 1.40€ + 2€)
+  const calcularTarifa = (distanciaKm) => {
+    return distanciaKm ? (distanciaKm * 1.40 + 2).toFixed(2) : "No especificada";
+  };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Esperando confirmación del usuario</Text>
+      <Text style={styles.title}>Detalles del Viaje</Text>
       {tripData ? (
         <View style={styles.infoContainer}>
-          <Text>📍 Origen: {tripData.lastLocation?.address || "N/A"}</Text>
-          <Text>🎯 Destino: {tripData.dropoffLocation?.address || "N/A"}</Text>
+
+          {/* 1️⃣ Origen (Ubicación del Usuario) */}
+          <Text>📍 Origen (Usuario): {tripData.lastLocation?.address || "N/A"}</Text>
+
+          {/* 2️⃣ Destino (Ubicación del Conductor cuando aceptó el viaje) */}
+          <Text>🎯 Destino (Conductor): {tripData.driverLocation ? `${tripData.driverLocation.latitude}, ${tripData.driverLocation.longitude}` : "No disponible"}</Text>
+
+          {/* 3️⃣ Tiempo Estimado */}
           <Text>⏳ Tiempo Estimado: {tripData.estimatedTime || "N/A"} min</Text>
-          <Text>💰 Tarifa: {tripData.fare ? `${tripData.fare}€` : "No especificada"}</Text>
-          <Text>🚖 Ubicación del Conductor: {tripData.driverLocation ? `${tripData.driverLocation.latitude}, ${tripData.driverLocation.longitude}` : "No disponible"}</Text>
+
+          {/* 4️⃣ Tarifa Tip */}
+          <Text>💰 Tarifa: {calcularTarifa(tripData.distance)}€</Text>
+
+          {/* 5️⃣ Ubicación en Tiempo Real del Conductor */}
+          <Text>🚖 Ubicación del Conductor en tiempo real: {tripData.driverLocation ? `${tripData.driverLocation.latitude}, ${tripData.driverLocation.longitude}` : "No disponible"}</Text>
+
         </View>
       ) : (
-        <Text>No hay datos disponibles.</Text>
+        <Text>Cargando datos del viaje...</Text>
       )}
+      <DriverFooter />
     </View>
   );
 };
@@ -65,8 +76,10 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   infoContainer: {
-    marginTop: 15,
-    alignItems: "center",
+    backgroundColor: "#fff",
+    padding: 15,
+    borderRadius: 10,
+    elevation: 3,
   },
 });
 
@@ -74,3 +87,35 @@ export default DriverTripDescriptionScreen;
 
 
 
+//bien podemos organizarlos para que salgan por orden el la pantalla
+// 1- Origen o Usuario / posicion del usuario al  seleccionar su ubicación.
+// 2- Destino o Canductor / Posicion del conductor desde el momento que selecciona Aceptar.
+// 3- Tiempo Estimado minutos que tadará el conductor hasta llegar al Ususario.
+// 4-Tarifa (llamada Tip) distancia  tripData.fare
+// 5- Ubicación del conductor en tiempo real. Este dato ya lo hemos recogido en el paso anterior con el numero 2.
+
+
+// ¡Sí, se entiende perfectamente! Ahora organizaremos los datos en DriverTripDescriptionScreen.js siguiendo el orden correcto para que la información fluya de manera lógica y sea más intuitiva para el usuario.
+
+// Nuevo Orden de Información en Pantalla
+// Ubicación inicial del usuario cuando solicita el viaje.
+// 1️⃣ 📍 (Usuario): Geo Localización del usuario 
+
+// Ubicación inicial del conductor  cuando solicita el viaje.
+// Fuente: tripData.lastLocation?.address
+// 2️⃣ 🚖 (Conductor): Geo Localización del conductor 
+
+// Ubicación del conductor en el momento en que acepta el viaje.
+// Fuente: tripData.driverLocation.latitude, tripData.driverLocation.longitude
+// 3️⃣ ⏳ Tiempo Estimado:
+
+// Tiempo que tardará el conductor en llegar al usuario.
+// Fuente: tripData.estimatedTime
+// 4️⃣ 💰 Tarifa (Tip):
+
+// Calculada como: (distancia en km * 1.40€) + 2€
+// Fuente: tripData.fare
+// 5️⃣ 🚖 Ubicación en Tiempo Real del Conductor:
+
+// Se actualiza constantemente mientras el conductor está en camino.
+// Fuente: tripData.driverLocation.latitude, tripData.driverLocation.longitude
