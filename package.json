@@ -32,7 +32,7 @@
     "@react-navigation/native-stack": "^7.2.0",
     "@react-navigation/stack": "^7.1.1",
     "dotenv": "^16.4.7",
-    "expo": "52.0.29",
+    "expo": "^52.0.30",
     "expo-location": "~18.0.5",
     "expo-status-bar": "~2.0.1",
     "expo-system-ui": "^4.0.7",

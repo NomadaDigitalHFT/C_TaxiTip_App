@@ -20,7 +20,6 @@ const ButtonConfirmationTrip = ({ userCardsId, onRemoveCard }) => {
 
     try {
       console.log("Intentando obtener ubicación del conductor...");
-
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
         Alert.alert("Error", "Permiso de ubicación denegado.");
@@ -53,7 +52,7 @@ const ButtonConfirmationTrip = ({ userCardsId, onRemoveCard }) => {
       await updateDoc(requestRef, {
         assignedDriver: driver.uid,
         driverLocation: driverLocation,
-        status: "fare_confirmed", // Cambio de estado para avanzar
+        status: "fare_confirmed",
       });
 
       console.log("Solicitud aceptada y Firestore actualizado.");
@@ -62,7 +61,7 @@ const ButtonConfirmationTrip = ({ userCardsId, onRemoveCard }) => {
       setIsWaiting(true);
       Alert.alert("🚖 Has aceptado el viaje. Esperando confirmación del usuario.");
 
-      navigation.navigate("DriverTripDescriptionScreen", { userCardsId });
+      navigation.navigate("DriverTripDescriptionScreen", { requestId: userCardsId });
     } catch (error) {
       console.error("Error al aceptar viaje:", error);
       Alert.alert("Error", `No se pudo aceptar la solicitud: ${error.message}`);
@@ -72,7 +71,7 @@ const ButtonConfirmationTrip = ({ userCardsId, onRemoveCard }) => {
   return (
     <View style={styles.container}>
       <Button
-        title={isWaiting ? "A la espera de Confirmación" : "Aceptar Viaje"}
+        title={isWaiting ? "Esperando Confirmación..." : "Aceptar Viaje"}
         onPress={handleAcceptTrip}
         color={isWaiting ? "#FFA500" : "#008000"}
         disabled={isWaiting}
@@ -90,3 +89,4 @@ const styles = StyleSheet.create({
 });
 
 export default ButtonConfirmationTrip;
+
